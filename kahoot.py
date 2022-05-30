@@ -1,18 +1,15 @@
 import tkinter as tk
-import json
+import winsound
 
 import requests
 
-json_answers = []
-index = 0
-counter = 0
+index, counter = int(), int()
 
 
 class Kahoot(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
-
         # the container is where we'll stack a bunch of frames
         # on top of each other, then the one we want visible
         # will be raised above the others
@@ -23,7 +20,7 @@ class Kahoot(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for frame in (MainMenu, Game, Preferences):
+        for frame in (MainMenu, Game, Preferences, TheEnd):
             page_name = frame.__name__
             frame = frame(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -65,36 +62,38 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
+    tmp = 0
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        global counter
+
         def display_question(number):
             current_question = data['results'][number]['question']
-            update_label(current_question)
-
-        def update_label(txt):
-            question_text.set(txt)
+            question_text.set(current_question)
 
         def start_game_btn():
-            global index
             display_question(index)
 
         def btn_onclick_handler(val):
             global index, counter
-            if index <= 10:
+            if index <= 8:
                 if val == bool(data['results'][index]['correct_answer']):
+                    winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
                     counter += 1
-                    index += 1
-                    display_question(index)
+                    print(counter)
                 else:
-                    index += 1
-                    display_question(index)
+                    winsound.MessageBeep(winsound.MB_ICONHAND)
+                    print(counter)
+                index += 1
+                display_question(index)
             else:
-
+                globals()['counter'] = counter
+                print(counter, "The End")
+                controller.show_frame("TheEnd")
+            return counter
 
         self.controller = controller
-        question_text = tk.StringVar()
+
         mainmenu_btn = tk.Button(self, text="Go to the main menu",
                                  command=lambda: controller.show_frame("MainMenu"))
         mainmenu_btn.pack(anchor="n")
@@ -103,6 +102,7 @@ class Game(tk.Frame):
                               command=lambda: [start_game_btn(), start_btn.pack_forget()])
         start_btn.pack(anchor="n")
 
+        question_text = tk.StringVar()
         question_label = tk.Label(self, textvariable=question_text)
         question_label.pack(side="top", fill="x", pady=10)
 
@@ -114,12 +114,26 @@ class Game(tk.Frame):
                               command=lambda val=False: btn_onclick_handler(val))
         false_btn.pack()
         truefalse_frame.pack()
-        global counter
-        counter_label = tk.Label(self, text=counter)
-        counter_label.pack(side="top")
 
         r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
         data = r.json()
+        for i in range(len(data['results'])):
+            if "&quot;" in str(data['results'][i]['question']):
+                data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
+
+
+class TheEnd(tk.Frame):
+    def __init__(self, parent, controller):
+        global counter
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        print()
+
+        label = tk.Label(self, text=f"You scored {counter} points!")
+        label.pack(side="top", fill="x", pady=10)
+        button = tk.Button(self, text="Go to the Main Menu",
+                           command=lambda: controller.show_frame("MainMenu"))
+        button.pack()
 
 
 class Preferences(tk.Frame):
