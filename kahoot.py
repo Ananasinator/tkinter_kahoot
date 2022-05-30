@@ -3,6 +3,10 @@ import json
 
 import requests
 
+json_answers = []
+index = 0
+counter = 0
+
 
 class Kahoot(tk.Tk):
 
@@ -64,7 +68,7 @@ class Game(tk.Frame):
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
+        global counter
         def display_question(number):
             current_question = data['results'][number]['question']
             update_label(current_question)
@@ -73,19 +77,21 @@ class Game(tk.Frame):
             question_text.set(txt)
 
         def start_game_btn():
-            display_question(0)
+            global index
+            display_question(index)
 
         def btn_onclick_handler(val):
-            if val == bool(data['results'][index]['correct_answer']):
-                return True
-            return False
+            global index, counter
+            if index <= 10:
+                if val == bool(data['results'][index]['correct_answer']):
+                    counter += 1
+                    index += 1
+                    display_question(index)
+                else:
+                    index += 1
+                    display_question(index)
+            else:
 
-        def check():
-            
-
-
-        counter = int()
-        index = 0
 
         self.controller = controller
         question_text = tk.StringVar()
@@ -102,13 +108,13 @@ class Game(tk.Frame):
 
         truefalse_frame = tk.Frame(self)
         true_btn = tk.Button(truefalse_frame, text="True",
-                             command=lambda val=True: btn_onclick_handler())
+                             command=lambda val=True: btn_onclick_handler(val))
         true_btn.pack(side="left")
         false_btn = tk.Button(truefalse_frame, text="False",
-                              command=lambda val=False: btn_onclick_handler())
+                              command=lambda val=False: btn_onclick_handler(val))
         false_btn.pack()
         truefalse_frame.pack()
-
+        global counter
         counter_label = tk.Label(self, text=counter)
         counter_label.pack(side="top")
 

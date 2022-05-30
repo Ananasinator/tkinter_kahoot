@@ -1,9 +1,29 @@
-def increase_global_index():
-    global index
-    index += 1
+# import requests
+# import urllib.request, json
+#
+# r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
+# data = r.json()
+# for i in range(len(data['results'])):
+#     print(data['results'][i]['correct_answer'])
+#
+# print(data['results'][1])
+
+def a(x):
+    x += 1
+    return x
 
 
-index = 1
+def b(x):
+    x *= 2
+    return x
 
-increase_global_index()
-print(index)
+
+def c():
+    global x
+    return x * 10
+
+
+x = 2
+print(a(x))
+print(b(x))
+print(x)
