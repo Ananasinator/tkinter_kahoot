@@ -1,8 +1,11 @@
 import os
 import sys
 import tkinter as tk
+from tkinter import messagebox
 import winsound
 import requests
+from PIL import ImageTk
+from pygame import mixer
 
 index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
@@ -55,6 +58,10 @@ class MainMenu(tk.Frame):
         app_name = tk.Label(self, text="Kahoot")
         app_name.pack(side="top", fill="x", pady=10)
 
+        img = ImageTk.PhotoImage(file='kahot.png', master=self)
+        image = tk.Label(self, image=img)
+        image.pack(side="top")
+
         start_btn = tk.Button(self, text="Start",
                               command=lambda: controller.show_frame("Game"))
         pref_btn = tk.Button(self, text="Preferences",
@@ -66,7 +73,6 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
-    cc = 1000
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -79,6 +85,7 @@ class Game(tk.Frame):
         start_btn = tk.Button(self, text="Start",
                               command=lambda: [self.updateQuestion(), start_btn.pack_forget()])
         start_btn.pack(anchor="n")
+
         global question_label
         question_label = tk.Label(self, textvariable=self.updateQuestion())
         question_label.pack(side="top", fill="x", pady=10)
@@ -95,6 +102,9 @@ class Game(tk.Frame):
         global counter_label
         counter_label = tk.Label(self, textvariable=self.updateCounter())
         counter_label.pack()
+
+    def remove_element(self, btn_name):
+        btn_name.pack_forget()
 
     def updateQuestion(self):
         global index, question_label
@@ -147,8 +157,16 @@ def restart_game():
     os.execl(python, python, *sys.argv)
 
 
+def on_closing():
+    if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        exit()
+
+
 if __name__ == "__main__":
     app = Kahoot()
-    # TODO: add preferences
     center_window(800, 600)
+    mixer.init()
+    mixer.music.load("play.mp3")
+    mixer.music.play()
+    app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()
