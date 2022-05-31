@@ -1,6 +1,10 @@
 import tkinter as tk
 import winsound
 import requests
+import sys
+import os
+import playsound
+
 
 index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
@@ -8,11 +12,20 @@ data = r.json()
 for i in range(len(data['results'])):
     if "&quot;" in str(data['results'][i]['question']):
         data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
-question_label = tk.Label(tk.Tk().withdraw())
-counter_label = tk.Label(tk.Tk().withdraw())
+root = tk.Tk().withdraw()
+question_label = tk.Label(root)
+counter_label = tk.Label(root)
 
 
-class Kahoot(tk.Tk):
+def restart_program():
+    """Restarts the current program.
+    Note: this function does not return. Any cleanup action (like
+    saving data) must be done before calling this function."""
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+
+class Kahot(tk.Tk):
 
     def __init__(self):
         tk.Tk.__init__(self)
@@ -64,19 +77,19 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
-    cc = 1000
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
         mainmenu_btn = tk.Button(self, text="Go to the main menu",
-                                 command=lambda: controller.show_frame("MainMenu"))
+                                 command=lambda: [controller.show_frame("MainMenu"), restart_program()])
         mainmenu_btn.pack(anchor="n")
 
         start_btn = tk.Button(self, text="Start",
                               command=lambda: [self.updateQuestion(), start_btn.pack_forget()])
         start_btn.pack(anchor="n")
+
         global question_label
         question_label = tk.Label(self, textvariable=self.updateQuestion())
         question_label.pack(side="top", fill="x", pady=10)
@@ -139,9 +152,7 @@ def center_window(width, height):
     y = (screen_height / 2) - (height / 2)
     app.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-
-if __name__ == "__main__":
-    app = Kahoot()
-    center_window(800, 800)
-    # app.geometry("800x800")
-    app.mainloop()
+app = Kahot()
+center_window(800, 600)
+playsound.playsound('bg.mp3', False)
+app.mainloop()
