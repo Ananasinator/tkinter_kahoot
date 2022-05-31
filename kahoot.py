@@ -3,6 +3,14 @@ import winsound
 import requests
 
 index, counter = int(), int()
+r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
+data = r.json()
+for i in range(len(data['results'])):
+    if "&quot;" in str(data['results'][i]['question']):
+        data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
+
+
+# question_text = ''
 
 
 class Kahoot(tk.Tk):
@@ -61,33 +69,34 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
+    q_var =
+    def display_question(self, number):
+        global data
+        current_question = data['results'][number]['question']
+        return current_question
+
+    def start_game_btn(self):
+        global index
+        self.display_question(index, )
+
+    def btn_onclick_handler(self, val):
+        global index, counter
+        if index <= 8:
+            if val == bool(data['results'][index]['correct_answer']):
+                winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+                counter += 1
+                print(counter)
+            else:
+                winsound.MessageBeep(winsound.MB_ICONHAND)
+                print(counter)
+            index += 1
+            self.display_question(index)
+        else:
+            print(counter, "The End")
+            self.controller.show_frame("TheEnd")
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-
-        def start_game_btn():
-            display_question(index)
-
-        def display_question(number):
-            current_question = data['results'][number]['question']
-            question_text.set(current_question)
-
-        def btn_onclick_handler(val):
-            global index, counter
-            if index <= 8:
-                if val == bool(data['results'][index]['correct_answer']):
-                    winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
-                    counter += 1
-                    print(counter)
-                else:
-                    winsound.MessageBeep(winsound.MB_ICONHAND)
-                    print(counter)
-                index += 1
-                display_question(index)
-            else:
-                print(counter, "The End")
-                controller.show_frame("TheEnd")
-
         self.controller = controller
 
         mainmenu_btn = tk.Button(self, text="Go to the main menu",
@@ -95,27 +104,21 @@ class Game(tk.Frame):
         mainmenu_btn.pack(anchor="n")
 
         start_btn = tk.Button(self, text="Start",
-                              command=lambda: [start_game_btn(), start_btn.pack_forget()])
+                              command=lambda: [self.start_game_btn(), start_btn.pack_forget()])
         start_btn.pack(anchor="n")
 
-        question_text = tk.StringVar()
-        question_label = tk.Label(self, textvariable=question_text)
+        q_var = tk.Variable()
+        question_label = tk.Label(self, textvariable=self.display_question(index))
         question_label.pack(side="top", fill="x", pady=10)
 
         truefalse_frame = tk.Frame(self)
         true_btn = tk.Button(truefalse_frame, text="True",
-                             command=lambda val=True: btn_onclick_handler(val))
+                             command=lambda val=True: self.btn_onclick_handler(val))
         true_btn.pack(side="left")
         false_btn = tk.Button(truefalse_frame, text="False",
-                              command=lambda val=False: btn_onclick_handler(val))
+                              command=lambda val=False: self.btn_onclick_handler(val))
         false_btn.pack()
         truefalse_frame.pack()
-
-        r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
-        data = r.json()
-        for i in range(len(data['results'])):
-            if "&quot;" in str(data['results'][i]['question']):
-                data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
 
 
 class TheEnd(tk.Frame):
@@ -125,7 +128,6 @@ class TheEnd(tk.Frame):
         self.controller = controller
 
         label = tk.Label(self, text=f"You scored {counter} points!")
-        f.close()
         label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Go to the Main Menu",
                            command=lambda: controller.show_frame("MainMenu"))
