@@ -1,3 +1,5 @@
+import os
+import sys
 import tkinter as tk
 import winsound
 import requests
@@ -71,7 +73,7 @@ class Game(tk.Frame):
         self.controller = controller
 
         mainmenu_btn = tk.Button(self, text="Go to the main menu",
-                                 command=lambda: controller.show_frame("MainMenu"))
+                                 command=lambda: [restart_game(), controller.show_frame("MainMenu")])
         mainmenu_btn.pack(anchor="n")
 
         start_btn = tk.Button(self, text="Start",
@@ -140,8 +142,15 @@ def center_window(width, height):
     app.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
 
+def restart_game():
+    """Restarts the current program.
+    Note: this function does not return. Any cleanup action (like
+    saving data) must be done before calling this function."""
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
+
+
 if __name__ == "__main__":
     app = Kahoot()
-    center_window(800, 800)
-    # app.geometry("800x800")
+    center_window(800, 600)
     app.mainloop()
