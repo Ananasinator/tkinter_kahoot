@@ -11,9 +11,25 @@ class Human:
         self.height = height
         self.weight = weight
 
+        Animal.change_gb(self)
+
+
+class Animal:
+    def __init__(self, type):
+        self.type = type
+
+        # self.change_gb()
+
+    def change_gb(self):
+        global g_age
+        g_age *= 100
+
+
+
 
 peter = Human(21, 180, 75)
-
+dog = Animal('dog')
+# dog.change_gb()
 print(g_age)
 
 # def display_question(self, number):

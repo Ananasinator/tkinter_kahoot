@@ -9,6 +9,7 @@ for i in range(len(data['results'])):
     if "&quot;" in str(data['results'][i]['question']):
         data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
 question_label = tk.Label(tk.Tk().withdraw())
+counter_label = tk.Label(tk.Tk().withdraw())
 
 
 class Kahoot(tk.Tk):
@@ -25,7 +26,7 @@ class Kahoot(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for frame in (MainMenu, Game, Preferences, TheEnd):
+        for frame in (MainMenu, Game, Preferences):
             page_name = frame.__name__
             frame = frame(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -56,20 +57,14 @@ class MainMenu(tk.Frame):
                               command=lambda: controller.show_frame("Game"))
         pref_btn = tk.Button(self, text="Preferences",
                              command=lambda: controller.show_frame("Preferences"))
-        quit_btn = tk.Button(self, text="Quit", command=lambda: quit())
+        quit_btn = tk.Button(self, text="Quit", command=lambda: exit())
         start_btn.pack()
         pref_btn.pack()
         quit_btn.pack()
 
-    def quit(self):
-        self.destroy()
-        exit()
-
-
-
-
 
 class Game(tk.Frame):
+    cc = 1000
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -95,15 +90,24 @@ class Game(tk.Frame):
         false_btn.pack()
         truefalse_frame.pack()
 
+        global counter_label
+        counter_label = tk.Label(self, textvariable=self.updateCounter())
+        counter_label.pack()
+
     def updateQuestion(self):
         global index, question_label
         question_label['text'] = str(data['results'][index]['question'])
+
+    def updateCounter(self):
+        global counter, counter_label
+        counter_label['text'] = int(counter)
 
     def onClickHandler(self, val):
         global index, data, counter
         try:
             if val == bool(data['results'][index]['correct_answer']):
                 counter += 1
+                self.updateCounter()
                 winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
 
             else:
@@ -111,24 +115,10 @@ class Game(tk.Frame):
             index += 1
             self.updateQuestion()
         except IndexError:
-
-
-
-class TheEnd(tk.Frame):
-    def __init__(self, parent, controller):
-        global counter
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-
-        label = tk.Label(self, text=f"You scored {counter} points!")
-        label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the Main Menu",
-                           command=lambda: controller.show_frame("MainMenu"))
-        button.pack()
+            question_label['text'] = str(f"You scored {counter} points!")
 
 
 class Preferences(tk.Frame):
-
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
@@ -139,7 +129,19 @@ class Preferences(tk.Frame):
         button.pack()
 
 
+def center_window(width, height):
+    # get screen width and height
+    screen_width = app.winfo_screenwidth()
+    screen_height = app.winfo_screenheight()
+
+    # calculate position x and y coordinates
+    x = (screen_width / 2) - (width / 2)
+    y = (screen_height / 2) - (height / 2)
+    app.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+
 if __name__ == "__main__":
     app = Kahoot()
-    app.geometry("800x800")
+    center_window(800, 800)
+    # app.geometry("800x800")
     app.mainloop()
