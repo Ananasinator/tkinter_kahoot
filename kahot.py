@@ -4,7 +4,8 @@ import tkinter as tk
 from tkinter import messagebox
 import winsound
 import requests
-# from PIL import ImageTk
+from PIL import ImageTk
+import PIL.Image
 
 index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
@@ -53,13 +54,14 @@ class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
+        #
+        # app_name = tk.Label(self, text="Kahoot")
+        # app_name.pack(side="top", fill="x", pady=10)
 
-        app_name = tk.Label(self, text="Kahoot")
-        app_name.pack(side="top", fill="x", pady=10)
-
-        # img = ImageTk.PhotoImage(file='kahot.png', master=self)
-        # image = tk.Label(self, image=img)
-        # image.pack(side="top")
+        canvas = tk.Canvas(self, width=440, height=240)
+        img = ImageTk.PhotoImage(master=canvas, image=PIL.Image.open('kahot.png'))
+        canvas.create_image(440, 240, image=img)
+        canvas.pack()
 
         start_btn = tk.Button(self, text="Start",
                               command=lambda: controller.show_frame("Game"))
