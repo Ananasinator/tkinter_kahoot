@@ -15,3 +15,30 @@ class Human:
 peter = Human(21, 180, 75)
 
 print(g_age)
+
+# def display_question(self, number):
+#     global data
+#     current_question = data['results'][number]['question']
+#     return current_question
+#
+#
+# def start_game_btn(self):
+#     global index
+#     self.display_question(index, )
+#
+#
+# def btn_onclick_handler(self, val):
+#     global index, counter
+#     if index <= 8:
+#         if val == bool(data['results'][index]['correct_answer']):
+#             winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+#             counter += 1
+#             print(counter)
+#         else:
+#             winsound.MessageBeep(winsound.MB_ICONHAND)
+#             print(counter)
+#         index += 1
+#         self.display_question(index)
+#     else:
+#         print(counter, "The End")
+#         self.controller.show_frame("TheEnd")

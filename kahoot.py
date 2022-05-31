@@ -2,15 +2,13 @@ import tkinter as tk
 import winsound
 import requests
 
-index, counter = int(), int()
+index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
 data = r.json()
 for i in range(len(data['results'])):
     if "&quot;" in str(data['results'][i]['question']):
         data['results'][i]['question'] = str(data['results'][i]['question']).replace("&quot;", "")
-
-
-# question_text = ''
+question_label = tk.Label(tk.Tk().withdraw())
 
 
 class Kahoot(tk.Tk):
@@ -68,32 +66,10 @@ class MainMenu(tk.Frame):
         exit()
 
 
+
+
+
 class Game(tk.Frame):
-    q_var =
-    def display_question(self, number):
-        global data
-        current_question = data['results'][number]['question']
-        return current_question
-
-    def start_game_btn(self):
-        global index
-        self.display_question(index, )
-
-    def btn_onclick_handler(self, val):
-        global index, counter
-        if index <= 8:
-            if val == bool(data['results'][index]['correct_answer']):
-                winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
-                counter += 1
-                print(counter)
-            else:
-                winsound.MessageBeep(winsound.MB_ICONHAND)
-                print(counter)
-            index += 1
-            self.display_question(index)
-        else:
-            print(counter, "The End")
-            self.controller.show_frame("TheEnd")
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
@@ -104,21 +80,38 @@ class Game(tk.Frame):
         mainmenu_btn.pack(anchor="n")
 
         start_btn = tk.Button(self, text="Start",
-                              command=lambda: [self.start_game_btn(), start_btn.pack_forget()])
+                              command=lambda: [self.updateQuestion(), start_btn.pack_forget()])
         start_btn.pack(anchor="n")
-
-        q_var = tk.Variable()
-        question_label = tk.Label(self, textvariable=self.display_question(index))
+        global question_label
+        question_label = tk.Label(self, textvariable=self.updateQuestion())
         question_label.pack(side="top", fill="x", pady=10)
 
         truefalse_frame = tk.Frame(self)
         true_btn = tk.Button(truefalse_frame, text="True",
-                             command=lambda val=True: self.btn_onclick_handler(val))
+                             command=lambda val=True: self.onClickHandler(val))
         true_btn.pack(side="left")
         false_btn = tk.Button(truefalse_frame, text="False",
-                              command=lambda val=False: self.btn_onclick_handler(val))
+                              command=lambda val=False: self.onClickHandler(val))
         false_btn.pack()
         truefalse_frame.pack()
+
+    def updateQuestion(self):
+        global index, question_label
+        question_label['text'] = str(data['results'][index]['question'])
+
+    def onClickHandler(self, val):
+        global index, data, counter
+        try:
+            if val == bool(data['results'][index]['correct_answer']):
+                counter += 1
+                winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+
+            else:
+                winsound.MessageBeep(winsound.MB_ICONHAND)
+            index += 1
+            self.updateQuestion()
+        except IndexError:
+
 
 
 class TheEnd(tk.Frame):
