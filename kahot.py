@@ -164,6 +164,8 @@ def on_closing():
 
 
 if __name__ == "__main__":
+    # mfsf
+
     app = Kahoot()
     center_window(800, 600)
     winsound.PlaySound("play.wav", winsound.SND_ASYNC)
