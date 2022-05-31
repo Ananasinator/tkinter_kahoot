@@ -4,8 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 import winsound
 import requests
-from PIL import ImageTk
-from pygame import mixer
+# from PIL import ImageTk
 
 index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
@@ -58,9 +57,9 @@ class MainMenu(tk.Frame):
         app_name = tk.Label(self, text="Kahoot")
         app_name.pack(side="top", fill="x", pady=10)
 
-        img = ImageTk.PhotoImage(file='kahot.png', master=self)
-        image = tk.Label(self, image=img)
-        image.pack(side="top")
+        # img = ImageTk.PhotoImage(file='kahot.png', master=self)
+        # image = tk.Label(self, image=img)
+        # image.pack(side="top")
 
         start_btn = tk.Button(self, text="Start",
                               command=lambda: controller.show_frame("Game"))
@@ -165,8 +164,6 @@ def on_closing():
 if __name__ == "__main__":
     app = Kahoot()
     center_window(800, 600)
-    mixer.init()
-    mixer.music.load("play.mp3")
-    mixer.music.play()
+    winsound.PlaySound("play.wav", winsound.SND_ASYNC)
     app.protocol("WM_DELETE_WINDOW", on_closing)
     app.mainloop()
