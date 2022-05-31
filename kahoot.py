@@ -1,6 +1,5 @@
 import tkinter as tk
 import winsound
-
 import requests
 
 index, counter = int(), int()
@@ -62,17 +61,16 @@ class MainMenu(tk.Frame):
 
 
 class Game(tk.Frame):
-    tmp = 0
 
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
 
+        def start_game_btn():
+            display_question(index)
+
         def display_question(number):
             current_question = data['results'][number]['question']
             question_text.set(current_question)
-
-        def start_game_btn():
-            display_question(index)
 
         def btn_onclick_handler(val):
             global index, counter
@@ -87,10 +85,8 @@ class Game(tk.Frame):
                 index += 1
                 display_question(index)
             else:
-                globals()['counter'] = counter
                 print(counter, "The End")
                 controller.show_frame("TheEnd")
-            return counter
 
         self.controller = controller
 
@@ -127,9 +123,9 @@ class TheEnd(tk.Frame):
         global counter
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        print()
 
         label = tk.Label(self, text=f"You scored {counter} points!")
+        f.close()
         label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Go to the Main Menu",
                            command=lambda: controller.show_frame("MainMenu"))
