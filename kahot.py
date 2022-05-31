@@ -149,5 +149,6 @@ def restart_game():
 
 if __name__ == "__main__":
     app = Kahoot()
+    # TODO: add preferences
     center_window(800, 600)
     app.mainloop()
