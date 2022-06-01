@@ -2,10 +2,9 @@ import os
 import sys
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import ttk
 import winsound
 import requests
-from PIL import ImageTk
-import PIL.Image
 
 index, counter = 0, 0
 r = requests.get('https://opentdb.com/api.php?amount=10&category=18&difficulty=easy&type=boolean')
@@ -54,14 +53,11 @@ class MainMenu(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        #
-        # app_name = tk.Label(self, text="Kahoot")
-        # app_name.pack(side="top", fill="x", pady=10)
 
-        canvas = tk.Canvas(self, width=440, height=240)
-        img = ImageTk.PhotoImage(master=canvas, image=PIL.Image.open('kahot.png'))
-        canvas.create_image(440, 240, image=img)
-        canvas.pack()
+        app_name = tk.Label(self, text="Kah(o)t")
+        app_description = tk.Label(self, text="CE (Computer Expert) Edition")
+        app_name.pack(side="top", fill="x", pady=10)
+        app_description.pack(side="top", fill="x", pady=10)
 
         start_btn = tk.Button(self, text="Start",
                               command=lambda: controller.show_frame("Game"))
@@ -135,11 +131,31 @@ class Preferences(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="PreferenceScreen")
-        label.pack(side="top", fill="x", pady=10)
-        button = tk.Button(self, text="Go to the MainMenu",
+
+        mainmenu_btn = tk.Button(self, text="Go to the MainMenu",
                            command=lambda: controller.show_frame("MainMenu"))
-        button.pack()
+        mainmenu_btn.pack()
+
+        label = tk.Label(self, text="Preferences")
+        label.pack(side="top", fill="x", pady=10)
+
+        setting_frame = tk.Frame(self)
+        res_label = tk.Label(setting_frame, text="Resolution: ")
+        resolutions = ttk.Combobox(setting_frame)
+        resolutions['values'] = ("800x600", "1366x768", "1920x1080")
+        resolutions.current()
+        resolutions.bind("<<ComboboxSelected>>", resize_window_callback)
+        res_label.pack(side="left")
+        resolutions.pack()
+        setting_frame.pack()
+        button = tk.Button(self, text="Stop music",
+                           command=stop_music())
+        button.pack(anchor="n")
+
+
+def resize_window_callback(event):
+    vals = event.widget.get().split("x")
+    center_window(int(vals[0]), int(vals[1]))
 
 
 def center_window(width, height):
@@ -163,9 +179,11 @@ def on_closing():
         exit()
 
 
-if __name__ == "__main__":
-    # mfsf
+def stop_music():
+    winsound.PlaySound(None, winsound.SND_ASYNC)
 
+
+if __name__ == "__main__":
     app = Kahoot()
     center_window(800, 600)
     winsound.PlaySound("play.wav", winsound.SND_ASYNC)
